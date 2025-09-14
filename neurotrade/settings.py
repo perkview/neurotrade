@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [
     "18.142.128.26",
     "54.254.162.138",
     "neurotrade-3.onrender.com",
+    "localhost",
+    "127.0.0.1", 
 ]
 
 

@@ -137,13 +137,12 @@ def main_loop():
             df = combined_strategy(df)
             last_row = df.iloc[-1]
 
-            close_price = last_row["Close"]
-            signal = last_row["Signal"]
-            ema_val = last_row["EMA_long"]
-            rsi_val = last_row["RSI"]
-            vol_spike = last_row["Vol_Spike"]
+            close_price = last_row['Close']
+            signal = last_row['Signal']
+            ema_val = last_row['EMA_long']
+            rsi_val = last_row['RSI']
+            vol_spike = last_row['Vol_Spike']
 
-            # Decide signal
             if signal == 1:
                 msg = f"✅ {name}: BUY @ ${close_price:.2f}"
                 signal_str = "BUY"
@@ -157,23 +156,21 @@ def main_loop():
             print(msg)
             latest_results.append(msg)
 
-            # Save to DB log
+            # Log to database
             log_prediction(
                 coin=name,
-                signal=signal_str,
-                price=close_price,
-                ema200=ema_val,
-                rsi=rsi_val,
-                volume_spike=vol_spike,
-                next_check=timezone.now() + timezone.timedelta(seconds=CHECK_INTERVAL_SECONDS),
+                signal_str=signal_str,
+                close_price=close_price,
+                ema_val=ema_val,
+                rsi_val=rsi_val,
+                vol_spike=vol_spike
             )
 
-        # Wait until next run (safe interruption)
+        # Wait 15 minutes (with safe interruption)
         for _ in range(CHECK_INTERVAL_SECONDS):
             if not bot_running:
                 break
             time.sleep(1)
-
 
 # ---------------- Run Bot ----------------
 if __name__ == "__main__":

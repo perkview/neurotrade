@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import datetime
 
 # Create your views here.
-
+    
 # Global variable to hold the bot thread
 bot_thread = None
 
@@ -58,51 +58,53 @@ def strategies(request):
 def reports(request):
     return render(request, "reports.html")
 
+
 @login_required
 def bot(request):
+    # Ensure bot status row exists
     bot_status, _ = BotStatus.objects.get_or_create(id=1)
 
-    # Fetch the single CoinPrediction log row
+    # Fetch prediction log object
     log_obj = CoinPrediction.objects.first()
-    log_lines = log_obj.log.strip().split("\n") if log_obj and log_obj.log else []
+    log_lines = log_obj.log.strip().split('\n') if log_obj and log_obj.log else []
 
     predictions = []
     for line in log_lines:
         try:
-            # Example log format:
+            # Example format:
             # [2025-09-14 15:30:00] BTC - BUY @ 26100.5 | EMA200: 25800, RSI: 35.4, Volume Spike: Yes, Next Check: 2025-09-14 16:30:00
 
-            # --- Extract timestamp ---
-            timestamp_part, rest = line.split("] ", 1)
-            timestamp_str = timestamp_part.strip("[")
+            # --- Timestamp ---
+            timestamp_part, rest = line.split('] ', 1)
+            timestamp_str = timestamp_part.strip('[')
             timestamp_dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
             timestamp_dt = timezone.make_aware(timestamp_dt, timezone=timezone.get_current_timezone())
 
-            # --- Extract coin, signal, price ---
-            coin_signal, indicators = rest.split("|", 1)
-            coin, signal_price = coin_signal.strip().split(" - ")
-            signal, price = signal_price.strip().split(" @ ")
+            # --- Coin, signal, price ---
+            coin_signal, indicators = rest.split('|', 1)
+            coin, signal_price = coin_signal.strip().split(' - ')
+            signal, price = signal_price.strip().split(' @ ')
             price = float(price)
 
-            # --- Extract indicators ---
-            parts = [p.strip() for p in indicators.split(",")]
-            ema200 = parts[0].split(":", 1)[1].strip()
-            rsi = parts[1].split(":", 1)[1].strip()
-            volume_spike = parts[2].split(":", 1)[1].strip()
-            next_check_str = parts[3].split(":", 1)[1].strip()
+            # --- Indicators ---
+            parts = indicators.split(',')
+            ema200 = parts[0].split(':', 1)[1].strip()
+            rsi = parts[1].split(':', 1)[1].strip()
+            volume_spike = parts[2].split(':', 1)[1].strip()
+            next_check_str = parts[3].split(':', 1)[1].strip()
 
-            # Convert Next Check → datetime
+            # Parse next_check safely
             try:
                 next_check_dt = datetime.strptime(next_check_str, "%Y-%m-%d %H:%M:%S")
                 next_check_dt = timezone.make_aware(next_check_dt, timezone=timezone.get_current_timezone())
             except Exception:
                 next_check_dt = None
 
-            # --- Build structured prediction ---
+            # --- Prediction dict ---
             predictions.append({
                 "timestamp": timestamp_dt,
-                "coin": coin,
-                "signal": signal,
+                "coin": coin.strip(),
+                "signal": signal.strip(),
                 "price": price,
                 "ema200": float(ema200) if ema200 != "N/A" else None,
                 "rsi": float(rsi) if rsi != "N/A" else None,
@@ -110,9 +112,8 @@ def bot(request):
                 "next_check": next_check_dt,
             })
 
-        except Exception as e:
-            # Skip malformed lines
-            continue
+        except Exception:
+            continue  # Skip malformed lines
 
     context = {
         "bot_status": bot_status,
