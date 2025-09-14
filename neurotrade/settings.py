@@ -133,3 +133,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://neurotrade-3.onrender.com",
+]
