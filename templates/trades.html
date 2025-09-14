@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold text-primary">Trades</h3>
+    </div>
+
+    <!-- Filters Row -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form class="row g-2 align-items-center">
+                <div class="col-md-2">
+                    <label class="form-label">Symbol</label>
+                    <select class="form-select">
+                        <option>All</option>
+                        <option>BTC</option>
+                        <option>ETH</option>
+                        <option>SOL</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select class="form-select">
+                        <option>All</option>
+                        <option>Open</option>
+                        <option>Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <input type="date" class="form-control mb-1">
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Search</label>
+                    <input type="text" class="form-control" placeholder="Search trades...">
+                </div>
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="button" class="btn btn-primary w-50">🔄 Refresh</button>
+                    <button type="button" class="btn btn-success w-50">⬇ Export CSV</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trades Table -->
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Symbol</th>
+                        <th>Side</th>
+                        <th>Quantity</th>
+                        <th>Entry Price</th>
+                        <th>Exit Price</th>
+                        <th>PnL</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>101</td>
+                        <td>BTC</td>
+                        <td><span class="badge bg-success">Buy</span></td>
+                        <td>0.05</td>
+                        <td>45,000</td>
+                        <td>46,200</td>
+                        <td class="text-success fw-bold">+1,200</td>
+                        <td><span class="badge bg-secondary">Closed</span></td>
+                        <td>2025-09-10</td>
+                    </tr>
+                    <tr>
+                        <td>102</td>
+                        <td>ETH</td>
+                        <td><span class="badge bg-danger">Sell</span></td>
+                        <td>1.0</td>
+                        <td>3,200</td>
+                        <td>3,050</td>
+                        <td class="text-success fw-bold">+150</td>
+                        <td><span class="badge bg-secondary">Closed</span></td>
+                        <td>2025-09-11</td>
+                    </tr>
+                    <tr>
+                        <td>103</td>
+                        <td>SOL</td>
+                        <td><span class="badge bg-success">Buy</span></td>
+                        <td>10</td>
+                        <td>150</td>
+                        <td>---</td>
+                        <td class="text-warning fw-bold">+20</td>
+                        <td><span class="badge bg-primary">Open</span></td>
+                        <td>2025-09-12</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="d-flex justify-content-center mt-3">
+        <ul class="pagination pagination-sm">
+            <li class="page-item"><a class="page-link" href="#">« Prev</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next »</a></li>
+        </ul>
+    </nav>
+
+</div>
+
+
+
+
+{% endblock %}

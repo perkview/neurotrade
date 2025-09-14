@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block dashboard_active %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- LEFT SIDEBAR (Quick Actions) -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white fw-bold">
+                Quick Actions
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action">✅ Start Algorithm</a>
+                <a href="#" class="list-group-item list-group-item-action">⏹️ Stop Algorithm</a>
+                <a href="#" class="list-group-item list-group-item-action">⚙️ Settings</a>
+                <a href="#" class="list-group-item list-group-item-action">🔔 Notifications</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD AREA -->
+    <div class="col-lg-9">
+        <!-- SUMMARY CARDS -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-muted">Algo Status</h6>
+                        <h5 class="text-success fw-bold">Running</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-muted">Last Signal</h6>
+                        <h5 class="fw-bold">BUY BTC</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-muted">Balance / Equity</h6>
+                        <h5 class="fw-bold">$12,540</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-muted">PnL Today</h6>
+                        <h5 class="text-success fw-bold">+ $340</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS / ANALYTICS -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white fw-bold">
+                📈 Charts & Analytics
+            </div>
+            <div class="card-body">
+                <p class="text-muted">[ Placeholder for Live Price Chart, EMA, RSI, MACD, Volume Bars ]</p>
+                <div class="bg-light border rounded p-5 text-center">
+                    <em>Candlestick Chart Area</em>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPEN TRADES TABLE -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white fw-bold">
+                📋 Open Trades
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Symbol</th>
+                            <th>Side</th>
+                            <th>Qty</th>
+                            <th>PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>001</td>
+                            <td>BTC/USDT</td>
+                            <td><span class="badge bg-success">BUY</span></td>
+                            <td>0.5</td>
+                            <td class="text-success">+$120</td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>ETH/USDT</td>
+                            <td><span class="badge bg-danger">SELL</span></td>
+                            <td>1.0</td>
+                            <td class="text-danger">- $45</td>
+                        </tr>
+                        <!-- More trades can be looped here using Django template tags -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Reports & Analytics</h2>
+        <button class="btn btn-outline-secondary">
+            <i class="bi bi-download"></i> Export PDF
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Trades</h6>
+                    <h3 class="fw-bold text-primary">1,245</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Win Rate</h6>
+                    <h3 class="fw-bold text-success">62%</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Net PnL</h6>
+                    <h3 class="fw-bold text-primary">+ $14,870</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Max Drawdown</h6>
+                    <h3 class="fw-bold text-danger">-12%</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Equity Curve</h5>
+                    <canvas id="equityChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Monthly PnL</h5>
+                    <canvas id="pnlChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Distribution -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Trade Distribution</h5>
+            <canvas id="tradeDistributionChart" height="150"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Reports Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Recent Reports</h5>
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Total Trades</th>
+                        <th>Win Rate</th>
+                        <th>Net PnL</th>
+                        <th>Drawdown</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-09-01</td>
+                        <td>122</td>
+                        <td>58%</td>
+                        <td>+ $1,240</td>
+                        <td>-5%</td>
+                        <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td>2025-08-15</td>
+                        <td>98</td>
+                        <td>65%</td>
+                        <td>+ $1,780</td>
+                        <td>-3%</td>
+                        <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td>2025-08-01</td>
+                        <td>115</td>
+                        <td>61%</td>
+                        <td>+ $1,520</td>
+                        <td>-4%</td>
+                        <td><button class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Equity Curve
+    new Chart(document.getElementById('equityChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'],
+            datasets: [{
+                label: 'Equity',
+                data: [10000, 10200, 10800, 11200, 10750, 11500, 12000, 12600, 12870],
+                borderColor: '#007BFF',
+                fill: false
+            }]
+        }
+    });
+
+    // Monthly PnL
+    new Chart(document.getElementById('pnlChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+            datasets: [{
+                label: 'PnL ($)',
+                data: [500, 300, -200, 700, -150, 1200, 900, 1500],
+                backgroundColor: ['#28A745', '#28A745', '#DC3545', '#28A745', '#DC3545', '#28A745', '#28A745', '#28A745']
+            }]
+        }
+    });
+
+    // Trade Distribution
+    new Chart(document.getElementById('tradeDistributionChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Winning Trades', 'Losing Trades'],
+            datasets: [{
+                data: [62, 38],
+                backgroundColor: ['#28A745', '#DC3545']
+            }]
+        }
+    });
+</script>
+{% endblock %}

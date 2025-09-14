@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Trading Strategies</h2>
+        <button class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Add Strategy
+        </button>
+    </div>
+
+    <!-- Strategy Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Type</label>
+                    <select class="form-select">
+                        <option value="">All</option>
+                        <option value="trend">Trend Following</option>
+                        <option value="mean">Mean Reversion</option>
+                        <option value="scalp">Scalping</option>
+                        <option value="arbitrage">Arbitrage</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Status</label>
+                    <select class="form-select">
+                        <option value="">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="testing">Testing</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Strategy List -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Available Strategies</h5>
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Performance</th>
+                        <th>Controls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#STR-001</td>
+                        <td>SMA/EMA Crossover</td>
+                        <td>Trend Following</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                        <td>2025-08-15</td>
+                        <td>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" style="width: 78%;"></div>
+                            </div>
+                            <small>+7.8%</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#STR-002</td>
+                        <td>Bollinger Band Reversal</td>
+                        <td>Mean Reversion</td>
+                        <td><span class="badge bg-warning text-dark">Testing</span></td>
+                        <td>2025-09-01</td>
+                        <td>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" style="width: 45%;"></div>
+                            </div>
+                            <small>-1.2%</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#STR-003</td>
+                        <td>High-Frequency Scalper</td>
+                        <td>Scalping</td>
+                        <td><span class="badge bg-secondary">Inactive</span></td>
+                        <td>2025-07-20</td>
+                        <td>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-secondary" style="width: 0%;"></div>
+                            </div>
+                            <small>0%</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

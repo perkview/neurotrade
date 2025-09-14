@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Auto Trading Bot{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+    <!-- Page Title & Subtitle -->
+    <div class="mb-4">
+        <h2 class="fw-bold text-primary">Auto Trading Bot</h2>
+        <p class="text-secondary">Monitor multi-coin strategies and performance in real-time</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <!-- Bot Control Buttons -->
+        <div class="d-flex gap-2 mb-3">
+            <button id="startBotBtn" class="btn btn-success">
+                <i class="bi bi-play-fill"></i> Start Bot
+            </button>
+            <button id="stopBotBtn" class="btn btn-danger">
+                <i class="bi bi-stop-fill"></i> Stop Bot
+            </button>
+        </div>
+
+        <!-- Bot Status -->
+        <p>
+            <strong>Current Status:</strong>
+            <span id="botStatus" class="text-danger">Stopped</span>
+        </p>
+
+        <!-- Bot Results Section -->
+        <div id="botResults" class="mt-3">
+            <h5 class="fw-bold">Latest Signals</h5>
+            <div class="card p-3 bg-light">
+                <ul id="resultsList" class="mb-0">
+                    <li>No results yet. Start the bot to see signals.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+
+                // ✅ Start Bot
+                $('#startBotBtn').click(function () {
+                    $.get("{% url 'start_bot' %}", function (data) {
+                        $('#botStatus')
+                            .text('Running')
+                            .removeClass('text-danger')
+                            .addClass('text-success');
+                        showToast(data.status);
+                    });
+                });
+
+                // ✅ Stop Bot
+                $('#stopBotBtn').click(function () {
+                    $.get("{% url 'stop_bot' %}", function (data) {
+                        $('#botStatus')
+                            .text('Stopped')
+                            .removeClass('text-success')
+                            .addClass('text-danger');
+                        showToast(data.status);
+                    });
+                });
+
+                // ✅ Fetch results every 10s
+                setInterval(function () {
+                    $.get("{% url 'bot_results' %}", function (data) {
+                        if (data.results && data.results.length > 0) {
+                            let html = "";
+                            data.results.forEach(msg => {
+                                html += `<li>${msg}</li>`;
+                            });
+                            $('#resultsList').html(html);
+                        } else {
+                            $('#resultsList').html("<li>No signals yet...</li>");
+                        }
+                    });
+                }, 10000);
+
+                // ✅ Optional: Bootstrap-like Toast Notification
+                function showToast(message) {
+                    const toast = $(`<div class="toast align-items-center text-bg-dark border-0 position-fixed bottom-0 end-0 m-3" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>`);
+
+                    $('body').append(toast);
+                    const bsToast = new bootstrap.Toast(toast[0]);
+                    bsToast.show();
+
+                    toast.on('hidden.bs.toast', function () {
+                        toast.remove();
+                    });
+                }
+            });
+        </script>
+
+
+        <button class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+        <button class="btn btn-secondary"><i class="bi bi-file-earmark-text"></i> Export Logs</button>
+    </div>
+
+    <!-- Bot Scheduler Panel -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold bg-light">Bot Scheduler Panel</div>
+        <div class="card-body">
+
+            <!-- Mode Selection -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Mode:</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="mode" id="durationMode" checked>
+                    <label class="form-check-label" for="durationMode">Run for Duration</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="mode" id="dateRangeMode">
+                    <label class="form-check-label" for="dateRangeMode">Run for Date Range</label>
+                </div>
+            </div>
+
+            <!-- Run for Duration -->
+            <div class="mb-3 border rounded p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <label class="form-label mb-0">Start Now:</label>
+                    <button class="btn btn-success btn-sm">Start</button>
+                    <label class="form-label mb-0">Duration:</label>
+                    <input type="text" class="form-control form-control-sm w-auto" value="10 hours">
+                </div>
+                <small class="text-muted">Optional: End Time is auto-calculated based on duration</small>
+            </div>
+
+            <!-- Run for Date Range -->
+            <div class="mb-3 border rounded p-3">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Start Date:</label>
+                        <input type="date" class="form-control" value="2025-10-01">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Start Time:</label>
+                        <input type="time" class="form-control" value="08:00">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">End Date:</label>
+                        <input type="date" class="form-control" value="2025-10-15">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">End Time:</label>
+                        <input type="time" class="form-control" value="20:00">
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <button class="btn btn-success btn-sm">Start Scheduler</button>
+                    <button class="btn btn-danger btn-sm">Stop Scheduler</button>
+                </div>
+            </div>
+
+            <!-- Current Status -->
+            <div>
+                <strong>Current Status:</strong> <span class="text-success">Bot Running</span><br>
+                <strong>Next Check:</strong> 2025-09-14 12:00
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Coin Summary Cards -->
+    <div class="mb-4">
+        <h5 class="fw-bold mb-2">Coin Summary</h5>
+        <div class="d-flex gap-3 overflow-auto">
+            <!-- Sample Coins -->
+            <div class="card text-center flex-shrink-0" style="width: 200px;">
+                <div class="card-body">
+                    <h6 class="card-title">BTC</h6>
+                    <p class="mb-1">Price: $116,000</p>
+                    <p class="mb-1">Last Signal: BUY</p>
+                    <p class="mb-1">PnL: +$1,000</p>
+                    <p class="mb-1">Status: Running</p>
+                    <button class="btn btn-primary btn-sm">View Details</button>
+                </div>
+            </div>
+            <div class="card text-center flex-shrink-0" style="width: 200px;">
+                <div class="card-body">
+                    <h6 class="card-title">ETH</h6>
+                    <p class="mb-1">Price: $4,700</p>
+                    <p class="mb-1">Last Signal: HOLD</p>
+                    <p class="mb-1">PnL: +$150</p>
+                    <p class="mb-1">Status: Running</p>
+                    <button class="btn btn-primary btn-sm">View Details</button>
+                </div>
+            </div>
+            <div class="card text-center flex-shrink-0" style="width: 200px;">
+                <div class="card-body">
+                    <h6 class="card-title">XRP</h6>
+                    <p class="mb-1">Price: $3.17</p>
+                    <p class="mb-1">Last Signal: SELL</p>
+                    <p class="mb-1">PnL: +$0.01</p>
+                    <p class="mb-1">Status: Stopped</p>
+                    <button class="btn btn-primary btn-sm">View Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Signal Table -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold bg-light">Live Signals</div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Coin</th>
+                        <th>Signal</th>
+                        <th>Price</th>
+                        <th>Next Check</th>
+                        <th>EMA200</th>
+                        <th>RSI</th>
+                        <th>Volume Spike</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BTC</td>
+                        <td>BUY</td>
+                        <td>$116,000</td>
+                        <td>15m</td>
+                        <td>$116,000</td>
+                        <td>28</td>
+                        <td>Yes</td>
+                        <td><button class="btn btn-success btn-sm">Execute</button></td>
+                    </tr>
+                    <tr>
+                        <td>ETH</td>
+                        <td>HOLD</td>
+                        <td>$4,700</td>
+                        <td>15m</td>
+                        <td>$4,600</td>
+                        <td>32</td>
+                        <td>No</td>
+                        <td><button class="btn btn-success btn-sm">Execute</button></td>
+                    </tr>
+                    <tr>
+                        <td>XRP</td>
+                        <td>SELL</td>
+                        <td>$3.17</td>
+                        <td>15m</td>
+                        <td>$3.10</td>
+                        <td>70</td>
+                        <td>Yes</td>
+                        <td><button class="btn btn-success btn-sm">Execute</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold bg-light">Performance Metrics</div>
+        <div class="card-body">
+            <div class="row text-center mb-3">
+                <div class="col"><strong>Total Trades:</strong> 120</div>
+                <div class="col"><strong>Win Rate:</strong> 75%</div>
+                <div class="col"><strong>Profit Factor:</strong> 1.8</div>
+                <div class="col"><strong>Avg Gain:</strong> +$350</div>
+                <div class="col"><strong>Avg Loss:</strong> -$120</div>
+                <div class="col"><strong>Net PnL:</strong> +$21,000</div>
+            </div>
+            <div class="mb-3">
+                <canvas id="pnlChart" height="100"></canvas>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <canvas id="winRateChart" height="100"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="signalAccuracyChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Log Table -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold bg-light">Trade Log</div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Coin</th>
+                        <th>Signal</th>
+                        <th>Entry Price</th>
+                        <th>Exit Price</th>
+                        <th>PnL</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-09-13 15:22</td>
+                        <td>BTC</td>
+                        <td>BUY</td>
+                        <td>$115,000</td>
+                        <td>$116,000</td>
+                        <td>+$1,000</td>
+                        <td>Closed</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>2025-09-13 15:22</td>
+                        <td>XRP</td>
+                        <td>SELL</td>
+                        <td>$3.18</td>
+                        <td>$3.17</td>
+                        <td>+$0.01</td>
+                        <td>Closed</td>
+                        <td>Quick drop</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Buttons -->
+<button id="startBotBtn" class="btn btn-success">Start Bot</button>
+<button id="stopBotBtn" class="btn btn-danger">Stop Bot</button>
+
+<!-- Status -->
+<p>Current Status: <span id="botStatus" class="text-success">Bot Stopped</span></p>
+
+
+{% endblock %}
