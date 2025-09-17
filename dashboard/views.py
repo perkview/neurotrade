@@ -124,7 +124,6 @@ def bot(request):
 
 @login_required
 def start_bot(request):
-    global bot_thread
     bot_status, _ = BotStatus.objects.get_or_create(id=1)
 
     if bot_status.is_running:
@@ -132,13 +131,7 @@ def start_bot(request):
     else:
         bot_status.is_running = True
         bot_status.save()
-
-        # Start bot in a background thread
-        strategy.bot_running = True
-        bot_thread = threading.Thread(target=strategy.main_loop, daemon=True)
-        bot_thread.start()
-
-        messages.success(request, "Bot started successfully!")
+        messages.success(request, "✅ Bot marked as running! (Background worker will pick it up)")
 
     return redirect("bot")
 
@@ -151,9 +144,6 @@ def stop_bot(request):
     else:
         bot_status.is_running = False
         bot_status.save()
-
-        # Stop bot
-        strategy.bot_running = False
-        messages.success(request, "Bot stopped successfully!")
+        messages.success(request, "🛑 Bot marked as stopped!")
 
     return redirect("bot")
