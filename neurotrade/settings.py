@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6g*q#xc55oyn8$f602$(x473yy_-35u)obd=qbh-p7h1l!v2k+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -137,5 +137,5 @@ STATICFILES_DIRS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://neurotrade-x-dp9j.onrender.com/",
+    "https://neurotrade-x-dp9j.onrender.com",
 ]
