@@ -27,13 +27,14 @@ SECRET_KEY = 'django-insecure-6g*q#xc55oyn8$f602$(x473yy_-35u)obd=qbh-p7h1l!v2k+
 DEBUG = False
 
 ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
     "13.228.225.19",
     "18.142.128.26",
     "54.254.162.138",
-    "neurotrade-3.onrender.com",
-    "localhost",
-    "127.0.0.1", 
+    "neurotrade-x-dp9j.onrender.com",
 ]
+
 
 
 
@@ -136,6 +137,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://neurotrade-3.onrender.com",
+    "https://neurotrade-x-dp9j.onrender.com/",
 ]
-
