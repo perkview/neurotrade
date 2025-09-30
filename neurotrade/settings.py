@@ -32,7 +32,7 @@ ALLOWED_HOSTS = [
     "13.228.225.19",
     "18.142.128.26",
     "54.254.162.138",
-    "neurotrade-5.onrender.com",
+    "neurotrade-6.onrender.com",
 ]
 
 
@@ -137,5 +137,6 @@ STATICFILES_DIRS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://neurotrade-5.onrender.com",
+    "https://neurotrade-6.onrender.com",
 ]
+
