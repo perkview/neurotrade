@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 
 urlpatterns = [
@@ -11,4 +11,6 @@ urlpatterns = [
     path('bot/', views.bot, name="bot"),
     path('start_bot/', views.start_bot, name="start_bot"),
     path('stop_bot/', views.stop_bot, name="stop_bot"),
+    path('start_trade/', views.start_trade, name="start_trade"),
+    path('stop_trade/', views.stop_trade, name="stop_trade"),
 ]

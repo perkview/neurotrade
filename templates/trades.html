@@ -1,122 +1,102 @@
 {% extends "base.html" %}
 {% load static %}
+{% load tz %}
 
 {% block content %}
 <div class="container-fluid mt-4">
 
-    <!-- Page Title -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold text-primary">Trades</h3>
-    </div>
-
-    <!-- Filters Row -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form class="row g-2 align-items-center">
-                <div class="col-md-2">
-                    <label class="form-label">Symbol</label>
-                    <select class="form-select">
-                        <option>All</option>
-                        <option>BTC</option>
-                        <option>ETH</option>
-                        <option>SOL</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Status</label>
-                    <select class="form-select">
-                        <option>All</option>
-                        <option>Open</option>
-                        <option>Closed</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Date Range</label>
-                    <input type="date" class="form-control mb-1">
-                    <input type="date" class="form-control">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Search</label>
-                    <input type="text" class="form-control" placeholder="Search trades...">
-                </div>
-                <div class="col-md-3 d-flex align-items-end gap-2">
-                    <button type="button" class="btn btn-primary w-50">🔄 Refresh</button>
-                    <button type="button" class="btn btn-success w-50">⬇ Export CSV</button>
-                </div>
-            </form>
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h3 class="fw-bold text-primary mb-0">Trades</h3>
+            <p class="text-muted">Monitor open and closed trades in real-time</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/start_trade/">
+                <button id="startBotBtn" class="btn btn-success">
+                    <i class="bi bi-play-fill"></i> Start Trading
+                </button>
+            </a>
+            <a href="/stop_trade/">
+                <button id="stopBotBtn" class="btn btn-danger">
+                    <i class="bi bi-stop-fill"></i> Stop Trading
+                </button>
+            </a>
         </div>
     </div>
 
-    <!-- Trades Table -->
+    <!-- Status Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Current Bot Status:</h5>
+            {% if trade_status and trade_status.is_running %}
+                <span id="botStatus" class="badge bg-success px-3 py-2 fs-6">Running</span>
+            {% else %}
+                <span id="botStatus" class="badge bg-danger px-3 py-2 fs-6">Stopped</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex align-items-end gap-2">
+            <button type="button" class="btn btn-primary w-50" onclick="location.reload()">🔄 Refresh</button>
+            <button type="button" class="btn btn-success w-50">⬇ Export CSV</button>
+        </div>
+    </div>
+
+    <!-- Trades Log -->
     <div class="card shadow-sm">
         <div class="card-body table-responsive">
             <table class="table table-bordered table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
-                        <th>Symbol</th>
-                        <th>Side</th>
-                        <th>Quantity</th>
-                        <th>Entry Price</th>
-                        <th>Exit Price</th>
-                        <th>PnL</th>
-                        <th>Status</th>
+                        <th>#</th>
+                        <th>Log Entry</th>
                         <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>101</td>
-                        <td>BTC</td>
-                        <td><span class="badge bg-success">Buy</span></td>
-                        <td>0.05</td>
-                        <td>45,000</td>
-                        <td>46,200</td>
-                        <td class="text-success fw-bold">+1,200</td>
-                        <td><span class="badge bg-secondary">Closed</span></td>
-                        <td>2025-09-10</td>
-                    </tr>
-                    <tr>
-                        <td>102</td>
-                        <td>ETH</td>
-                        <td><span class="badge bg-danger">Sell</span></td>
-                        <td>1.0</td>
-                        <td>3,200</td>
-                        <td>3,050</td>
-                        <td class="text-success fw-bold">+150</td>
-                        <td><span class="badge bg-secondary">Closed</span></td>
-                        <td>2025-09-11</td>
-                    </tr>
-                    <tr>
-                        <td>103</td>
-                        <td>SOL</td>
-                        <td><span class="badge bg-success">Buy</span></td>
-                        <td>10</td>
-                        <td>150</td>
-                        <td>---</td>
-                        <td class="text-warning fw-bold">+20</td>
-                        <td><span class="badge bg-primary">Open</span></td>
-                        <td>2025-09-12</td>
-                    </tr>
+                    {% if log_entries %}
+                        {% for log in log_entries %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td style="white-space: pre-wrap; font-family: monospace; font-size:0.85rem;">{{ log }}</td>
+                            <td>{{ log|slice:1|date:"d-M-Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center">No trades logged yet. Start the bot to create trades.</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Pagination -->
-    <nav class="d-flex justify-content-center mt-3">
-        <ul class="pagination pagination-sm">
-            <li class="page-item"><a class="page-link" href="#">« Prev</a></li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next »</a></li>
-        </ul>
-    </nav>
-
 </div>
 
+<!-- Messages / Toasts -->
+<div id="messagesContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="toast align-items-center text-bg-info border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">{{ message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
 
-
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.map(toastEl => new bootstrap.Toast(toastEl, { delay: 3000, autohide: true }).show());
+    });
+</script>
 {% endblock %}

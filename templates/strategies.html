@@ -2,130 +2,252 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">Trading Strategies</h2>
-        <button class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Add Strategy
-        </button>
+
+<div class="card shadow-sm p-4">
+  <h4 class="mb-3">Strategy Settings</h4>
+
+  <!-- Info Alert -->
+  <div class="alert alert-info">
+    <strong>Strategy Update:</strong> Mild BUY signals are now generated even without volume spikes, and weak strict BUYs are automatically converted to <em>MILD_BUY</em> based on confidence scores.
+  </div>
+
+  <!-- Display current coins JSON -->
+  <div class="mb-3">
+    <label class="form-label">Current Coins JSON</label>
+    <pre class="p-2 bg-light border">{{ settings.coins|default:"{}" }}</pre>
+  </div>
+
+  <form method="POST" action="/strategies/">
+    {% csrf_token %}
+
+    <!-- Coins JSON -->
+    <div class="mb-3">
+      <label class="form-label">Coins (JSON format)</label>
+      <textarea name="coins" class="form-control" rows="3">{{ settings.coins|default:"{}" }}</textarea>
+      <div class="form-text">Example: {"BTC": "BTC-USD", "ETH": "ETH-USD"}</div>
     </div>
 
-    <!-- Strategy Filters -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Type</label>
-                    <select class="form-select">
-                        <option value="">All</option>
-                        <option value="trend">Trend Following</option>
-                        <option value="mean">Mean Reversion</option>
-                        <option value="scalp">Scalping</option>
-                        <option value="arbitrage">Arbitrage</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Status</label>
-                    <select class="form-select">
-                        <option value="">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="testing">Testing</option>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel"></i> Filter
-                    </button>
-                </div>
-            </form>
-        </div>
+    <!-- Low Volatility Coins -->
+    <div class="mb-3">
+      <label class="form-label text-primary">Low Volatility Coins (JSON list)</label>
+      <textarea name="low_vol_coins" class="form-control" rows="2">{{ settings.low_vol_coins|default:"[]" }}</textarea>
+      <div class="form-text">Example: ["BTC", "ETH", "BNB"]</div>
     </div>
 
-    <!-- Strategy List -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title fw-bold mb-3">Available Strategies</h5>
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Performance</th>
-                        <th>Controls</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>#STR-001</td>
-                        <td>SMA/EMA Crossover</td>
-                        <td>Trend Following</td>
-                        <td><span class="badge bg-success">Active</span></td>
-                        <td>2025-08-15</td>
-                        <td>
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-success" style="width: 78%;"></div>
-                            </div>
-                            <small>+7.8%</small>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#STR-002</td>
-                        <td>Bollinger Band Reversal</td>
-                        <td>Mean Reversion</td>
-                        <td><span class="badge bg-warning text-dark">Testing</span></td>
-                        <td>2025-09-01</td>
-                        <td>
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-warning" style="width: 45%;"></div>
-                            </div>
-                            <small>-1.2%</small>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#STR-003</td>
-                        <td>High-Frequency Scalper</td>
-                        <td>Scalping</td>
-                        <td><span class="badge bg-secondary">Inactive</span></td>
-                        <td>2025-07-20</td>
-                        <td>
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-secondary" style="width: 0%;"></div>
-                            </div>
-                            <small>0%</small>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- High Volatility Coins -->
+    <div class="mb-3">
+      <label class="form-label text-danger">High Volatility Coins (JSON list)</label>
+      <textarea name="high_vol_coins" class="form-control" rows="2">{{ settings.high_vol_coins|default:"[]" }}</textarea>
+      <div class="form-text">Example: ["DOGE", "MANA", "SAND"]</div>
     </div>
+
+    <!-- General Settings -->
+    <h5 class="mt-4">General Settings</h5>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Period</label>
+        <input type="text" name="period" class="form-control" value="{{ settings.period }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Interval</label>
+        <input type="text" name="interval" class="form-control" value="{{ settings.interval }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Check Interval (seconds)</label>
+        <input type="number" name="check_interval_seconds" class="form-control" value="{{ settings.check_interval_seconds }}">
+      </div>
+      <div class="col-md-6 mb-3 d-flex align-items-center">
+        <div class="form-check">
+          <input type="checkbox" name="active" class="form-check-input" {% if settings.active %}checked{% endif %}>
+          <label class="form-check-label">Bot Active</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicators -->
+    <h5 class="mt-4">Indicators</h5>
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">EMA Period</label>
+        <input type="number" name="ema_period" class="form-control" value="{{ settings.ema_period }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">RSI Period</label>
+        <input type="number" name="rsi_period" class="form-control" value="{{ settings.rsi_period }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Volume MA Period</label>
+        <input type="number" name="volume_ma_period" class="form-control" value="{{ settings.volume_ma_period }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Volume Spike Multiplier</label>
+        <input type="number" step="0.1" name="volume_spike_multiplier" class="form-control" value="{{ settings.volume_spike_multiplier }}">
+      </div>
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" name="use_volume" class="form-check-input" {% if settings.use_volume %}checked{% endif %}>
+      <label class="form-check-label">Use Volume Spike</label>
+    </div>
+
+    <!-- RSI Thresholds -->
+    <h5 class="mt-4">RSI Thresholds</h5>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-primary">Low Volatility - Buy RSI</label>
+        <input type="number" name="buy_rsi_low" class="form-control" value="{{ settings.buy_rsi_low }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-primary">Low Volatility - Sell RSI</label>
+        <input type="number" name="sell_rsi_low" class="form-control" value="{{ settings.sell_rsi_low }}">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-danger">High Volatility - Buy RSI</label>
+        <input type="number" name="buy_rsi_high" class="form-control" value="{{ settings.buy_rsi_high }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-danger">High Volatility - Sell RSI</label>
+        <input type="number" name="sell_rsi_high" class="form-control" value="{{ settings.sell_rsi_high }}">
+      </div>
+    </div>
+
+    <!-- EMA Buffers -->
+    <h5 class="mt-4">EMA Buffers</h5>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">EMA Buy Buffer (%)</label>
+        <input type="number" step="0.001" name="ema_buffer_buy" class="form-control" value="{{ settings.ema_buffer_buy }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">EMA Sell Buffer (%)</label>
+        <input type="number" step="0.001" name="ema_buffer_sell" class="form-control" value="{{ settings.ema_buffer_sell }}">
+      </div>
+    </div>
+
+    <!-- Mild RSI Buffers -->
+    <h5 class="mt-4">Mild RSI Buffers</h5>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-primary">Mild RSI Buffer - Low Volatility</label>
+        <input type="number" step="0.1" name="mild_rsi_buffer_low" class="form-control" value="{{ settings.mild_rsi_buffer_low }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-danger">Mild RSI Buffer - High Volatility</label>
+        <input type="number" step="0.1" name="mild_rsi_buffer_high" class="form-control" value="{{ settings.mild_rsi_buffer_high }}">
+      </div>
+    </div>
+
+    <!-- Confidence Settings -->
+    <h5 class="mt-4">Confidence Settings</h5>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Confidence Threshold</label>
+        <input type="number" step="0.01" name="confidence_threshold" class="form-control" value="{{ settings.confidence_threshold }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Ultra-Low Confidence Threshold</label>
+        <input type="number" step="0.01" name="ultra_low_conf_threshold" class="form-control" value="{{ settings.ultra_low_conf_threshold }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">RSI Weight</label>
+        <input type="number" step="0.01" name="confidence_rsi_weight" class="form-control" value="{{ settings.confidence_rsi_weight }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">EMA Weight</label>
+        <input type="number" step="0.01" name="confidence_ema_weight" class="form-control" value="{{ settings.confidence_ema_weight }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Volume Weight</label>
+        <input type="number" step="0.01" name="confidence_vol_weight" class="form-control" value="{{ settings.confidence_vol_weight }}">
+      </div>
+    </div>
+
+    <!-- Volatility Settings -->
+    <h5 class="mt-4">Volatility Settings</h5>
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Volatility Window</label>
+        <input type="number" name="volatility_window" class="form-control" value="{{ settings.volatility_window }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Vol Adjust Low</label>
+        <input type="number" step="0.1" name="vol_adjust_low" class="form-control" value="{{ settings.vol_adjust_low }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Vol Adjust High</label>
+        <input type="number" step="0.1" name="vol_adjust_high" class="form-control" value="{{ settings.vol_adjust_high }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Default Recent Accuracy</label>
+        <input type="number" step="0.01" name="default_recent_accuracy" class="form-control" value="{{ settings.default_recent_accuracy }}">
+      </div>
+    </div>
+
+    <!-- RSI Limits -->
+    <h5 class="mt-4">RSI Hard Limits</h5>
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Min Buy RSI</label>
+        <input type="number" name="min_buy_rsi" class="form-control" value="{{ settings.min_buy_rsi }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Max Buy RSI</label>
+        <input type="number" name="max_buy_rsi" class="form-control" value="{{ settings.max_buy_rsi }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Min Sell RSI</label>
+        <input type="number" name="min_sell_rsi" class="form-control" value="{{ settings.min_sell_rsi }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Max Sell RSI</label>
+        <input type="number" name="max_sell_rsi" class="form-control" value="{{ settings.max_sell_rsi }}">
+      </div>
+    </div>
+
+    <!-- Mild Buffer Limit -->
+    <div class="mb-3">
+      <label class="form-label">Mild RSI Buffer Minimum</label>
+      <input type="number" step="0.1" name="mild_rsi_buffer_min" class="form-control" value="{{ settings.mild_rsi_buffer_min }}">
+    </div>
+
+    <!-- Logging -->
+    <h5 class="mt-4">Logging</h5>
+    <div class="mb-3">
+      <label class="form-label">Next Check (minutes)</label>
+      <input type="number" name="log_next_check_minutes" class="form-control" value="{{ settings.log_next_check_minutes }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Save Settings</button>
+  </form>
 </div>
+
+<!-- Messages / Toasts -->
+<div id="messagesContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="toast align-items-center 
+                        {% if bot_status.is_running %}
+                            text-bg-success
+                        {% else %}
+                            text-bg-danger
+                        {% endif %}
+                        border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">{{ message }}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
 {% endblock %}

@@ -11,10 +11,10 @@
                 Quick Actions
             </div>
             <div class="list-group list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action">✅ Start Algorithm</a>
-                <a href="#" class="list-group-item list-group-item-action">⏹️ Stop Algorithm</a>
-                <a href="#" class="list-group-item list-group-item-action">⚙️ Settings</a>
-                <a href="#" class="list-group-item list-group-item-action">🔔 Notifications</a>
+                <a href="{% url 'start_trade' %}" class="list-group-item list-group-item-action">✅ Start Algorithm</a>
+                <a href="{% url 'stop_trade' %}" class="list-group-item list-group-item-action">⏹️ Stop Algorithm</a>
+                <a href="{% url 'strategies' %}" class="list-group-item list-group-item-action">⚙️ Settings</a>
+                <a href="/notifications  /" class="list-group-item list-group-item-action">🔔 Notifications</a>
             </div>
         </div>
     </div>
@@ -27,7 +27,11 @@
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h6 class="text-muted">Algo Status</h6>
-                        <h5 class="text-success fw-bold">Running</h5>
+                        {% if bot_status.is_running %}
+                            <h5 class="text-success fw-bold">Running</h5>
+                        {% else %}
+                            <h5 class="text-danger fw-bold">Stopped</h5>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -35,7 +39,11 @@
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h6 class="text-muted">Last Signal</h6>
-                        <h5 class="fw-bold">BUY BTC</h5>
+                        {% if last_trade %}
+                            <h5 class="fw-bold">{{ last_trade.action }} {{ last_trade.coin }}</h5>
+                        {% else %}
+                            <h5 class="fw-bold">N/A</h5>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -43,7 +51,7 @@
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h6 class="text-muted">Balance / Equity</h6>
-                        <h5 class="fw-bold">$12,540</h5>
+                        <h5 class="fw-bold">${{ balance|floatformat:2 }}</h5>
                     </div>
                 </div>
             </div>
@@ -51,7 +59,9 @@
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h6 class="text-muted">PnL Today</h6>
-                        <h5 class="text-success fw-bold">+ $340</h5>
+                        <h5 class="{% if pnl_today >= 0 %}text-success{% else %}text-danger{% endif %} fw-bold">
+                            {% if pnl_today >= 0 %}+{% else %}-{% endif %}${{ pnl_today|floatformat:2 }}
+                        </h5>
                     </div>
                 </div>
             </div>
@@ -63,10 +73,9 @@
                 📈 Charts & Analytics
             </div>
             <div class="card-body">
-                <p class="text-muted">[ Placeholder for Live Price Chart, EMA, RSI, MACD, Volume Bars ]</p>
-                <div class="bg-light border rounded p-5 text-center">
-                    <em>Candlestick Chart Area</em>
-                </div>
+                <p class="text-muted">Equity Curve & PnL Overview</p>
+                <canvas id="equityChart" height="200"></canvas>
+                <canvas id="pnlChart" height="200" class="mt-4"></canvas>
             </div>
         </div>
 
@@ -87,25 +96,68 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for trade in open_trades %}
                         <tr>
-                            <td>001</td>
-                            <td>BTC/USDT</td>
-                            <td><span class="badge bg-success">BUY</span></td>
-                            <td>0.5</td>
-                            <td class="text-success">+$120</td>
+                            <td>{{ trade.id }}</td>
+                            <td>{{ trade.coin }}</td>
+                            <td>
+                                <span class="badge {% if trade.action == 'BUY' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ trade.action }}
+                                </span>
+                            </td>
+                            <td>{{ trade.quantity|default:"N/A" }}</td>
+                            <td class="{% if trade.pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {% if trade.pnl >= 0 %}+{% else %}-{% endif %}${{ trade.pnl|default:0|floatformat:2 }}
+                            </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>002</td>
-                            <td>ETH/USDT</td>
-                            <td><span class="badge bg-danger">SELL</span></td>
-                            <td>1.0</td>
-                            <td class="text-danger">- $45</td>
+                            <td colspan="5" class="text-center text-muted">No open trades</td>
                         </tr>
-                        <!-- More trades can be looped here using Django template tags -->
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Charts Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Prepare equity and pnl data from Django context
+    const equityData = {{ equity_curve|safe }};
+    const pnlData = {{ monthly_pnl|safe }};
+    const pnlColors = pnlData.map(val => val >= 0 ? '#28A745' : '#DC3545');
+
+    // Equity Curve Chart
+    new Chart(document.getElementById('equityChart'), {
+        type: 'line',
+        data: {
+            labels: {{ equity_labels|safe }},
+            datasets: [{
+                label: 'Equity',
+                data: equityData,
+                borderColor: '#007BFF',
+                fill: false,
+                tension: 0.2
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // Monthly PnL Chart
+    new Chart(document.getElementById('pnlChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ pnl_labels|safe }},
+            datasets: [{
+                label: 'PnL ($)',
+                data: pnlData,
+                backgroundColor: pnlColors
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
 {% endblock %}
